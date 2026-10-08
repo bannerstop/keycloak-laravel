@@ -60,6 +60,10 @@ abstract class TestCase extends Testbench
                 return redirect()->route('keycloak.login');
             })->name('login');
             Route::get('/me', $me)->middleware('auth');
+            // what an Inertia app shares with every page
+            Route::get('/shared', static function (Request $request): array {
+                return ['auth' => ['user' => $request->user()]];
+            })->middleware('auth');
             Route::get('/admin', $me)->middleware(['auth', 'keycloak.role:admin']);
             Route::get('/public', static function () {
                 return ['error' => session('keycloak_error')];

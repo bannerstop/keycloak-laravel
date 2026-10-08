@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Redirector;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 final class KeycloakController extends Controller
 {
@@ -71,11 +72,11 @@ final class KeycloakController extends Controller
     /**
      * Starts the login. Pass "return_to" (a local path) to come back to a page afterwards.
      */
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request): Response
     {
         $returnTo = $request->query->get('return_to');
 
-        return $this->redirector->away($this->flow->start(
+        return $this->away($request, $this->flow->start(
             $this->redirector->getUrlGenerator()->route('keycloak.callback'),
             is_string($returnTo) && RedirectTarget::isLocal($returnTo) ? $returnTo : null,
             (array) ($this->config['authorization_parameters'] ?? [])
@@ -109,7 +110,7 @@ final class KeycloakController extends Controller
     /**
      * Ends the local and the Keycloak session.
      */
-    public function logout(Request $request): RedirectResponse
+    public function logout(Request $request): Response
     {
         $tokens = $request->session()->get(self::TOKENS);
         $this->guard()->logout();
@@ -126,7 +127,21 @@ final class KeycloakController extends Controller
             $url = null;
         }
 
-        return null === $url ? $this->redirector->to($target) : $this->redirector->away($url);
+        return null === $url ? $this->redirector->to($target) : $this->away($request, $url);
+    }
+
+    /**
+     * Inertia visits are XHR requests, which cannot follow a redirect to
+     * Keycloak's host. Inertia expects a 409 with X-Inertia-Location instead
+     * and then navigates the browser itself (what Inertia::location() does).
+     */
+    private function away(Request $request, string $url): Response
+    {
+        if ($request->headers->has('X-Inertia')) {
+            return new Response('', Response::HTTP_CONFLICT, ['X-Inertia-Location' => $url]);
+        }
+
+        return $this->redirector->away($url);
     }
 
     /**
