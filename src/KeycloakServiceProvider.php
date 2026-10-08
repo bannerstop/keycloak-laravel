@@ -11,10 +11,13 @@ use Bannerstop\Keycloak\KeycloakConfig;
 use Bannerstop\Keycloak\Login\LoginFlow;
 use Bannerstop\Keycloak\Policy\EmailDomainPolicy;
 use Bannerstop\Keycloak\Role\RoleMapper;
+use Bannerstop\Keycloak\Session\SessionCheck;
+use Bannerstop\Keycloak\Session\SessionRevocations;
 use Bannerstop\KeycloakLaravel\Auth\BearerTokenResolver;
 use Bannerstop\KeycloakLaravel\Auth\KeycloakUserProvider;
 use Bannerstop\KeycloakLaravel\Auth\SessionStateStore;
 use Bannerstop\KeycloakLaravel\Auth\UserProvisioner;
+use Bannerstop\KeycloakLaravel\Http\Middleware\EnsureKeycloakSessionIsValid;
 use Bannerstop\KeycloakLaravel\Http\Middleware\RequireKeycloakRole;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Contracts\Foundation\Application;
@@ -43,6 +46,15 @@ final class KeycloakServiceProvider extends ServiceProvider
 
             return new LoginFlow($app->make(KeycloakClient::class), new SessionStateStore($app->make('session.store')), $policies);
         });
+        $this->app->singleton(SessionRevocations::class, fn (Application $app): SessionRevocations => new SessionRevocations(
+            $app->make('cache')->store($app->make('config')->get('keycloak.cache_store')),
+            (int) $app->make('config')->get('keycloak.session.revocation_ttl', 28800),
+        ));
+        $this->app->singleton(SessionCheck::class, fn (Application $app): SessionCheck => new SessionCheck(
+            $app->make(KeycloakClient::class),
+            $app->make(SessionRevocations::class),
+            (int) $app->make('config')->get('keycloak.session.check_interval', 0),
+        ));
         $this->app->bind(KeycloakUserProvider::class, fn (Application $app): KeycloakUserProvider => new KeycloakUserProvider($app->make('session.store')));
         $this->app->bind(UserProvisioner::class, fn (Application $app): UserProvisioner => $app->make($app->make('config')->get('keycloak.user_provisioner') ?? KeycloakUserProvider::class));
     }
@@ -65,6 +77,7 @@ final class KeycloakServiceProvider extends ServiceProvider
         )($request));
 
         $this->app->make('router')->aliasMiddleware('keycloak.role', RequireKeycloakRole::class);
+        $this->app->make('router')->aliasMiddleware('keycloak.session', EnsureKeycloakSessionIsValid::class);
     }
 
     private function client(Application $app, KeycloakConfig $config): KeycloakClient

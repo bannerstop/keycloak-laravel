@@ -119,41 +119,6 @@ final class KeycloakLoginTest extends TestCase
         self::assertSame(401, $response->getStatusCode());
     }
 
-    /**
-     * @return \Illuminate\Testing\TestResponse|\Illuminate\Foundation\Testing\TestResponse
-     */
-    private function login()
-    {
-        $authorizationUrl = (string) $this->browse('GET', '/login/keycloak/login')->headers->get('Location');
-
-        return $this->browse('GET', '/login/keycloak/callback?' . http_build_query(self::keycloakLogin($authorizationUrl)));
-    }
-
-    /**
-     * Fills in the Keycloak login form like a browser and returns the callback query.
-     *
-     * @return array<string, string>
-     */
-    private static function keycloakLogin(string $authorizationUrl): array
-    {
-        $cookies = (string) tempnam(sys_get_temp_dir(), 'kc');
-        $curl = curl_init($authorizationUrl);
-        curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $cookies, CURLOPT_COOKIEFILE => $cookies]);
-        $form = \Dom\HTMLDocument::createFromString((string) curl_exec($curl), LIBXML_NOERROR)->getElementById('kc-form-login');
-        self::assertNotNull($form, 'Keycloak shows its login form.');
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $form->getAttribute('action'),
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query(['username' => 'jdoe', 'password' => 'jane-password']),
-        ]);
-        curl_exec($curl);
-        $location = (string) curl_getinfo($curl, CURLINFO_REDIRECT_URL);
-        self::assertNotSame('', $location, 'Keycloak redirects back.');
-        parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
-
-        return $query;
-    }
-
     private static function passwordGrantAccessToken(): string
     {
         $curl = curl_init(getenv('KEYCLOAK_URL') . '/realms/example/protocol/openid-connect/token');
