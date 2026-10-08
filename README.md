@@ -135,6 +135,53 @@ public function share(Request $request): array
 
 The frontend then gets `subject`, `email`, `name` and `roles`.
 
+### Ending sessions with Keycloak
+
+Logging out of Keycloak, or of another application, does not end the Laravel
+session by itself. Two mechanisms close that gap; use both.
+
+**Back-channel logout**: Keycloak posts a signed logout token to
+`POST /keycloak/backchannel-logout` (route `keycloak.backchannel-logout`,
+without the `web` group, so no session and no CSRF token) whenever a session
+ends. In the Keycloak client, set *Backchannel logout URL* to
+`https://your-app.example/keycloak/backchannel-logout` and turn on
+*Backchannel logout session required*. Ended sessions are remembered in the
+cache store `keycloak.cache_store` for `keycloak.session.revocation_ttl`
+seconds (default 8 h, should be at least the session lifetime); with several
+web servers the store must be shared, e.g. Redis or the database.
+
+**Session check**: the `keycloak.session` middleware ends sessions that
+Keycloak revoked through the back channel. With
+`KEYCLOAK_SESSION_CHECK_INTERVAL` (seconds) it also redeems the refresh token
+that often, which fails once the Keycloak session is gone (logout elsewhere,
+user disabled, SSO session expired). If Keycloak is unreachable, the session is
+kept. Keycloak does not send a back-channel call for every session in every
+case (e.g. when an administrator signs a user out of all sessions), so keep the
+interval check on as a safety net, e.g. 300.
+
+```php
+// app/Http/Kernel.php
+protected $middlewareGroups = [
+    'web' => [
+        // ...
+        'keycloak.session',
+    ],
+];
+```
+
+```dotenv
+KEYCLOAK_SESSION_CHECK_INTERVAL=300
+```
+
+When a session ends, the middleware logs the user out and answers with a
+redirect to the same URL (the `auth` middleware then sends them to the login),
+`401` for JSON requests, or `409` + `X-Inertia-Location` for Inertia visits.
+Livewire (e.g. Filament) requests use `fetch()` too, which cannot follow a
+redirect to Keycloak; send them to a page on your own host instead. Sessions
+that were not opened by a Keycloak login are left alone. Parallel requests of
+one session may both run the refresh check; that only costs a second token
+request.
+
 ### Roles
 
 ```php
