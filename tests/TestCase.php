@@ -65,6 +65,7 @@ abstract class TestCase extends Testbench
                 return ['auth' => ['user' => $request->user()]];
             })->middleware('auth');
             Route::get('/admin', $me)->middleware(['auth', 'keycloak.role:admin']);
+            Route::get('/checked', $me)->middleware(['keycloak.session', 'auth']);
             Route::get('/public', static function () {
                 return ['error' => session('keycloak_error')];
             });
@@ -97,5 +98,41 @@ abstract class TestCase extends Testbench
         }
 
         return $response;
+    }
+
+    /**
+     * @return \Illuminate\Testing\TestResponse|\Illuminate\Foundation\Testing\TestResponse
+     */
+    protected function login()
+    {
+        $authorizationUrl = (string) $this->browse('GET', '/login/keycloak/login')->headers->get('Location');
+
+        return $this->browse('GET', '/login/keycloak/callback?' . http_build_query(self::keycloakLogin($authorizationUrl)));
+    }
+
+    /**
+     * Fills in the Keycloak login form like a browser and returns the callback query.
+     *
+     * @return array<string, string>
+     */
+    protected static function keycloakLogin(string $authorizationUrl): array
+    {
+        $cookies = (string) tempnam(sys_get_temp_dir(), 'kc');
+        $curl = curl_init($authorizationUrl);
+        curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $cookies, CURLOPT_COOKIEFILE => $cookies]);
+        $html = (string) curl_exec($curl);
+        self::assertSame(1, preg_match('/<form[^>]+id="kc-form-login"[^>]+action="([^"]+)"/', $html, $form), 'Keycloak shows its login form.');
+        curl_setopt_array($curl, [
+            CURLOPT_URL => html_entity_decode($form[1]),
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query(['username' => 'jdoe', 'password' => 'jane-password']),
+            CURLOPT_HEADER => true,
+        ]);
+        $response = (string) curl_exec($curl);
+        curl_close($curl);
+        self::assertSame(1, preg_match('/^Location: (\S+)/mi', $response, $location), 'Keycloak redirects back.');
+        parse_str((string) parse_url($location[1], PHP_URL_QUERY), $query);
+
+        return $query;
     }
 }
