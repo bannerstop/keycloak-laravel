@@ -10,6 +10,7 @@ use Bannerstop\Keycloak\KeycloakClient;
 use Bannerstop\Keycloak\Login\LoginFlow;
 use Bannerstop\Keycloak\Login\RedirectTarget;
 use Bannerstop\Keycloak\Role\RoleMapper;
+use Bannerstop\Keycloak\Session\KeycloakSession;
 use Bannerstop\Keycloak\Token\TokenSet;
 use Bannerstop\KeycloakLaravel\Auth\UserProvisioner;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -23,6 +24,9 @@ use Psr\Log\LoggerInterface;
 
 final class KeycloakController extends Controller
 {
+    public const string SESSION = 'keycloak.session';
+
+    /** Where 10.2 and earlier kept the tokens; still read on logout. */
     private const string TOKENS = 'keycloak.tokens';
 
     /** @var array<string, mixed> */
@@ -69,7 +73,7 @@ final class KeycloakController extends Controller
         $user = $this->provisioner->provision($identity, $this->roleMapper->map($identity));
         $this->guard()->login($user);
         $request->session()->regenerate();
-        $request->session()->put(self::TOKENS, $result->getTokens()->toArray());
+        $request->session()->put(self::SESSION, KeycloakSession::fromLogin($result, $this->client->now())->toArray());
 
         $returnTo = $result->getReturnTo();
         if (null !== $returnTo && RedirectTarget::isLocal($returnTo)) {
@@ -84,22 +88,33 @@ final class KeycloakController extends Controller
      */
     public function logout(Request $request): Response
     {
-        $tokens = $request->session()->get(self::TOKENS);
+        $idToken = $this->idToken($request);
         $this->guard()->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         $target = $this->redirector->getUrlGenerator()->to((string) $this->config['logout_redirect_to']);
-        if (!is_array($tokens)) {
+        if (null === $idToken) {
             return $this->redirector->to($target);
         }
         try {
-            $url = $this->client->getLogoutUrl($target, TokenSet::fromArray($tokens)->getIdToken());
+            $url = $this->client->getLogoutUrl($target, $idToken);
         } catch (HttpException) {
             $url = null;
         }
 
         return null === $url ? $this->redirector->to($target) : $this->away($request, $url);
+    }
+
+    private function idToken(Request $request): ?string
+    {
+        $session = KeycloakSession::fromArray((array) $request->session()->get(self::SESSION, []));
+        if (null !== $session) {
+            return $session->getTokens()->getIdToken();
+        }
+        $tokens = $request->session()->get(self::TOKENS);
+
+        return is_array($tokens) ? TokenSet::fromArray($tokens)->getIdToken() : null;
     }
 
     /**
