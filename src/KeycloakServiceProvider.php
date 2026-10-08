@@ -65,13 +65,13 @@ final class KeycloakServiceProvider extends ServiceProvider
         }
 
         Auth::provider('keycloak', fn (Application $app): KeycloakUserProvider => $app->make(KeycloakUserProvider::class));
-        Auth::viaRequest('keycloak-bearer', fn ($request) => (new BearerTokenResolver(
+        Auth::viaRequest('keycloak-bearer', fn ($request) => new BearerTokenResolver(
             $this->app->make(KeycloakClient::class),
             $this->app->make(RoleMapper::class),
             $this->app->make(UserProvisioner::class),
             $this->app->make('log'),
-            $this->app->make('config')->get('keycloak.bearer.audience')
-        ))($request));
+            $this->app->make('config')->get('keycloak.bearer.audience'),
+        )($request));
 
         $this->app->make('router')->aliasMiddleware('keycloak.role', RequireKeycloakRole::class);
     }

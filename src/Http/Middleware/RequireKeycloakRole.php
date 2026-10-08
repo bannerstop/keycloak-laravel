@@ -17,7 +17,7 @@ final class RequireKeycloakRole
     public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
         $user = $request->user();
-        if (!$user instanceof HasKeycloakRoles || [] === array_intersect($roles, $user->getKeycloakRoles())) {
+        if (!$user instanceof HasKeycloakRoles || !array_any($roles, static fn (string $role): bool => in_array($role, $user->getKeycloakRoles(), true))) {
             abort(403);
         }
 

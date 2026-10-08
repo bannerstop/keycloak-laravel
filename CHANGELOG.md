@@ -3,6 +3,12 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 9.0.0
+
+- Requires PHP 8.4 or later, Laravel 12 or 13 and bannerstop/keycloak 9.x.
+- `keycloak.role` checks roles with `array_any()`; `new` without parentheses.
+- The test suite fails on deprecations triggered by the package itself.
+
 ## 8.0.0
 
 - Requires PHP 8.3 or later, Laravel 11, 12 or 13 and bannerstop/keycloak 8.x.
