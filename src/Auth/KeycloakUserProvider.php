@@ -13,12 +13,12 @@ use Illuminate\Contracts\Session\Session;
  * The default: KeycloakUser objects kept in the session. Use the "keycloak"
  * user provider driver for the guard the login uses.
  */
-final class KeycloakUserProvider implements UserProvider, UserProvisioner
+final readonly class KeycloakUserProvider implements UserProvider, UserProvisioner
 {
     private const SESSION_KEY = 'keycloak.user';
 
     public function __construct(
-        private readonly Session $session,
+        private Session $session,
     ) {
     }
 
@@ -41,7 +41,7 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
     /**
      * @param string $token
      */
-    public function retrieveByToken(mixed $identifier, $token): ?Authenticatable
+    public function retrieveByToken(mixed $identifier, #[\SensitiveParameter] $token): ?Authenticatable
     {
         return null;
     }
@@ -49,14 +49,14 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
     /**
      * @param string $token
      */
-    public function updateRememberToken(Authenticatable $user, $token): void
+    public function updateRememberToken(Authenticatable $user, #[\SensitiveParameter] $token): void
     {
     }
 
     /**
      * @param array<string, mixed> $credentials
      */
-    public function retrieveByCredentials(array $credentials): ?Authenticatable
+    public function retrieveByCredentials(#[\SensitiveParameter] array $credentials): ?Authenticatable
     {
         return null;
     }
@@ -64,7 +64,7 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
     /**
      * @param array<string, mixed> $credentials
      */
-    public function validateCredentials(Authenticatable $user, array $credentials): bool
+    public function validateCredentials(Authenticatable $user, #[\SensitiveParameter] array $credentials): bool
     {
         return false;
     }
@@ -73,7 +73,7 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
      * @param array<string, mixed> $credentials
      * @param bool                 $force
      */
-    public function rehashPasswordIfRequired(Authenticatable $user, array $credentials, $force = false): void
+    public function rehashPasswordIfRequired(Authenticatable $user, #[\SensitiveParameter] array $credentials, $force = false): void
     {
     }
 }

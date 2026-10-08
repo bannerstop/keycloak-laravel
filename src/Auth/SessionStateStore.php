@@ -11,13 +11,13 @@ use Illuminate\Contracts\Session\Session;
 /**
  * Pending logins in the Laravel session, at most five at a time.
  */
-final class SessionStateStore implements StateStore
+final readonly class SessionStateStore implements StateStore
 {
     private const KEY = 'keycloak.logins';
     private const MAX_PENDING = 5;
 
     public function __construct(
-        private readonly Session $session,
+        private Session $session,
     ) {
     }
 

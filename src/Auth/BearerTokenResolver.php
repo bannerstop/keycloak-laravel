@@ -17,14 +17,14 @@ use Psr\Log\LoggerInterface;
  * The "keycloak-bearer" guard driver: the user behind the access token in
  * the Authorization header, or null.
  */
-final class BearerTokenResolver
+final readonly class BearerTokenResolver
 {
     public function __construct(
-        private readonly KeycloakClient $client,
-        private readonly RoleMapper $roleMapper,
-        private readonly UserProvisioner $provisioner,
-        private readonly LoggerInterface $logger,
-        private readonly ?string $audience,
+        private KeycloakClient $client,
+        private RoleMapper $roleMapper,
+        private UserProvisioner $provisioner,
+        private LoggerInterface $logger,
+        private ?string $audience,
     ) {
     }
 

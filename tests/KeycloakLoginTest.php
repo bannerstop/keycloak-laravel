@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Bannerstop\KeycloakLaravel\Tests;
 
 use Bannerstop\Keycloak\Role\RoleMapper;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Runs against the Keycloak of the core package's tests-e2e (KEYCLOAK_URL).
- *
- * @group keycloak
  */
+#[Group('keycloak')]
 final class KeycloakLoginTest extends TestCase
 {
     protected function setUp(): void

@@ -11,16 +11,16 @@ use Illuminate\Contracts\Auth\Authenticatable;
  * A user that lives only in the session, for applications without their own
  * user table. The identifier is the Keycloak subject.
  */
-final class KeycloakUser implements Authenticatable, HasKeycloakRoles
+final readonly class KeycloakUser implements Authenticatable, HasKeycloakRoles
 {
     /**
      * @param string[] $roles
      */
     public function __construct(
-        private readonly string $subject,
-        private readonly ?string $email,
-        private readonly string $name,
-        private readonly array $roles,
+        private string $subject,
+        private ?string $email,
+        private string $name,
+        private array $roles,
     ) {
     }
 
@@ -100,7 +100,7 @@ final class KeycloakUser implements Authenticatable, HasKeycloakRoles
     /**
      * @param string $value
      */
-    public function setRememberToken($value): void
+    public function setRememberToken(#[\SensitiveParameter] $value): void
     {
     }
 

@@ -3,6 +3,12 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 7.0.0
+
+- Requires PHP 8.2 or later, Laravel 10, 11 or 12 and bannerstop/keycloak 7.x.
+- Readonly classes; credentials and remember tokens passed to the user provider
+  are marked `#[\SensitiveParameter]` and stay out of stack traces.
+
 ## 6.0.0
 
 - Requires PHP 8.1 or later, Laravel 9 or 10 and bannerstop/keycloak 6.x.
