@@ -3,6 +3,14 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 7.2.0
+
+- Works with Inertia: for Inertia visits, the login and logout routes answer
+  with `409` and `X-Inertia-Location` instead of a redirect to Keycloak, which
+  an XHR request cannot follow. Other requests get the redirect as before.
+- `KeycloakUser` is `Arrayable` and `JsonSerializable` (subject, e-mail, name,
+  roles), e.g. for Inertia's shared props.
+
 ## 7.1.0
 
 - Optional separate client for the user directory: set
