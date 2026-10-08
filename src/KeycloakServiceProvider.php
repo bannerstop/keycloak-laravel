@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bannerstop\KeycloakLaravel;
 
 use Bannerstop\Keycloak\Admin\UserDirectory;
+use Bannerstop\Keycloak\Exception\ConfigurationException;
 use Bannerstop\Keycloak\KeycloakClient;
 use Bannerstop\Keycloak\KeycloakConfig;
 use Bannerstop\Keycloak\Login\LoginFlow;
@@ -33,18 +34,10 @@ final class KeycloakServiceProvider extends ServiceProvider
             return KeycloakConfig::fromArray((array) $app->make('config')->get('keycloak'));
         });
         $this->app->singleton(KeycloakClient::class, function (Application $app): KeycloakClient {
-            $factory = new Psr17Factory();
-
-            return new KeycloakClient(
-                $app->make(KeycloakConfig::class),
-                $this->httpClient($app),
-                $factory,
-                $factory,
-                $app->make('cache')->store($app->make('config')->get('keycloak.cache_store'))
-            );
+            return $this->client($app, $app->make(KeycloakConfig::class));
         });
         $this->app->singleton(UserDirectory::class, function (Application $app): UserDirectory {
-            return new UserDirectory($app->make(KeycloakClient::class));
+            return new UserDirectory($this->directoryClient($app));
         });
         $this->app->singleton(RoleMapper::class, function (Application $app): RoleMapper {
             return RoleMapper::fromArray((array) $app->make('config')->get('keycloak.roles'));
@@ -88,6 +81,39 @@ final class KeycloakServiceProvider extends ServiceProvider
         });
 
         $this->app->make('router')->aliasMiddleware('keycloak.role', RequireKeycloakRole::class);
+    }
+
+    private function client(Application $app, KeycloakConfig $config): KeycloakClient
+    {
+        $factory = new Psr17Factory();
+
+        return new KeycloakClient(
+            $config,
+            $this->httpClient($app),
+            $factory,
+            $factory,
+            $app->make('cache')->store($app->make('config')->get('keycloak.cache_store'))
+        );
+    }
+
+    /**
+     * The client for the admin API: a separate one when keycloak.directory.client_id
+     * is set, otherwise the login client.
+     */
+    private function directoryClient(Application $app): KeycloakClient
+    {
+        $directory = (array) $app->make('config')->get('keycloak.directory');
+        $clientId = (string) ($directory['client_id'] ?? '');
+        if ('' === $clientId) {
+            return $app->make(KeycloakClient::class);
+        }
+        $clientSecret = (string) ($directory['client_secret'] ?? '');
+        if ('' === $clientSecret) {
+            throw new ConfigurationException('keycloak.directory.client_secret (KEYCLOAK_DIRECTORY_CLIENT_SECRET) is required when keycloak.directory.client_id is set.');
+        }
+        $options = array_merge((array) $app->make('config')->get('keycloak'), ['client_id' => $clientId, 'client_secret' => $clientSecret]);
+
+        return $this->client($app, KeycloakConfig::fromArray($options));
     }
 
     private function httpClient(Application $app): ClientInterface
