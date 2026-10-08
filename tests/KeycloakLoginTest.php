@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bannerstop\KeycloakLaravel\Tests;
 
+use Bannerstop\Keycloak\Role\RoleMapper;
+
 /**
  * Runs against the Keycloak of the core package's tests-e2e (KEYCLOAK_URL).
  *
@@ -52,7 +54,7 @@ final class KeycloakLoginTest extends TestCase
     public function testRolesAreOnlyGrantedWhenMapped(): void
     {
         $this->app['config']->set('keycloak.roles.realm_roles', []);
-        $this->app->forgetInstance(\Bannerstop\Keycloak\Role\RoleMapper::class);
+        $this->app->forgetInstance(RoleMapper::class);
 
         $this->login();
 

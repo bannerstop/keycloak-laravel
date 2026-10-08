@@ -3,6 +3,10 @@
 Each major version raises the minimum PHP version and the supported Laravel
 versions. Only the steps that need changes in your code are listed.
 
+## 2.x → 3.x
+
+- PHP 7.3 or later is required. No code changes needed.
+
 ## 1.x → 2.x
 
 - PHP 7.2 or later and Laravel 6 or later are required. No code changes needed.
