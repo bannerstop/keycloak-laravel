@@ -19,6 +19,7 @@ abstract class TestCase extends Testbench
      *
      * @return string[]
      */
+    #[\Override]
     protected function getPackageProviders($app): array
     {
         return [KeycloakServiceProvider::class];
@@ -27,6 +28,7 @@ abstract class TestCase extends Testbench
     /**
      * @param \Illuminate\Foundation\Application $app
      */
+    #[\Override]
     protected function getEnvironmentSetUp($app): void
     {
         $app['config']->set('app.key', 'base64:' . base64_encode(str_repeat('k', 32)));
@@ -64,6 +66,7 @@ abstract class TestCase extends Testbench
         Route::get('/api/me', $me)->middleware('auth:api');
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

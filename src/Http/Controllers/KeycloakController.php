@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
 
 final class KeycloakController extends Controller
 {
-    private const TOKENS = 'keycloak.tokens';
+    private const string TOKENS = 'keycloak.tokens';
 
     /** @var array<string, mixed> */
     private array $config;

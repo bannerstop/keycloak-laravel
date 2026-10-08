@@ -67,31 +67,37 @@ final readonly class KeycloakUser implements Authenticatable, HasKeycloakRoles
         return $this->name;
     }
 
+    #[\Override]
     public function getKeycloakRoles(): array
     {
         return $this->roles;
     }
 
+    #[\Override]
     public function getAuthIdentifierName(): string
     {
         return 'subject';
     }
 
+    #[\Override]
     public function getAuthIdentifier(): string
     {
         return $this->subject;
     }
 
+    #[\Override]
     public function getAuthPassword(): string
     {
         return '';
     }
 
+    #[\Override]
     public function getAuthPasswordName(): string
     {
         return 'password';
     }
 
+    #[\Override]
     public function getRememberToken(): ?string
     {
         return null;
@@ -100,10 +106,12 @@ final readonly class KeycloakUser implements Authenticatable, HasKeycloakRoles
     /**
      * @param string $value
      */
+    #[\Override]
     public function setRememberToken(#[\SensitiveParameter] $value): void
     {
     }
 
+    #[\Override]
     public function getRememberTokenName(): string
     {
         return '';

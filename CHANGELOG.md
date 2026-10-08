@@ -3,6 +3,11 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 8.0.0
+
+- Requires PHP 8.3 or later, Laravel 11, 12 or 13 and bannerstop/keycloak 8.x.
+- Typed class constants and `#[\Override]` on every implemented contract method.
+
 ## 7.0.0
 
 - Requires PHP 8.2 or later, Laravel 10, 11 or 12 and bannerstop/keycloak 7.x.

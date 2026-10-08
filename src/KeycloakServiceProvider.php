@@ -24,6 +24,7 @@ use Psr\Http\Client\ClientInterface;
 
 final class KeycloakServiceProvider extends ServiceProvider
 {
+    #[\Override]
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/keycloak.php', 'keycloak');

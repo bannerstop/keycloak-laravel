@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('keycloak')]
 final class KeycloakLoginTest extends TestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         if (false === getenv('KEYCLOAK_URL')) {

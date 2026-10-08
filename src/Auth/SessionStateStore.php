@@ -13,14 +13,15 @@ use Illuminate\Contracts\Session\Session;
  */
 final readonly class SessionStateStore implements StateStore
 {
-    private const KEY = 'keycloak.logins';
-    private const MAX_PENDING = 5;
+    private const string KEY = 'keycloak.logins';
+    private const int MAX_PENDING = 5;
 
     public function __construct(
         private Session $session,
     ) {
     }
 
+    #[\Override]
     public function save(PendingLogin $login): void
     {
         $pending = $this->all();
@@ -28,6 +29,7 @@ final readonly class SessionStateStore implements StateStore
         $this->session->put(self::KEY, array_slice($pending, -self::MAX_PENDING, null, true));
     }
 
+    #[\Override]
     public function take(string $state): ?PendingLogin
     {
         $pending = $this->all();
