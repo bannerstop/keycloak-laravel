@@ -3,6 +3,18 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 5.3.0
+
+- Back-channel logout: `POST /keycloak/backchannel-logout` (route
+  `keycloak.backchannel-logout`) records sessions Keycloak ended.
+- `keycloak.session` middleware: ends sessions whose Keycloak session was
+  revoked and, with `KEYCLOAK_SESSION_CHECK_INTERVAL`, checks the Keycloak
+  session through the refresh token. Config `keycloak.session.check_interval`
+  and `keycloak.session.revocation_ttl`.
+- The login stores the Keycloak session under `keycloak.session`; sessions
+  from 5.2 and earlier (`keycloak.tokens`) still log out of Keycloak.
+- Requires `bannerstop/keycloak` 5.1.
+
 ## 5.2.0
 
 - Works with Inertia: for Inertia visits, the login and logout routes answer
