@@ -114,6 +114,28 @@ Logout is POST only, so that other sites cannot log your users out:
 </form>
 ```
 
+### Inertia
+
+The package works with [Inertia](https://inertiajs.com) without extra setup.
+Inertia visits are XHR requests, which cannot follow a redirect to Keycloak;
+for them, the login and logout routes answer with `409` and
+`X-Inertia-Location`, so Inertia sends the browser to Keycloak itself. A
+`<Link href="/keycloak/login">` and `router.post('/keycloak/logout')` therefore
+work like plain links and forms.
+
+`KeycloakUser` is `Arrayable` and `JsonSerializable`, so it can go straight
+into the shared props:
+
+```php
+// app/Http/Middleware/HandleInertiaRequests.php
+public function share(Request $request): array
+{
+    return [...parent::share($request), 'auth' => ['user' => $request->user()]];
+}
+```
+
+The frontend then gets `subject`, `email`, `name` and `roles`.
+
 ### Roles
 
 ```php
