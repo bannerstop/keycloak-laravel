@@ -6,12 +6,16 @@ namespace Bannerstop\KeycloakLaravel\Auth;
 
 use Bannerstop\Keycloak\Identity;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * A user that lives only in the session, for applications without their own
  * user table. The identifier is the Keycloak subject.
  */
-final readonly class KeycloakUser implements Authenticatable, HasKeycloakRoles
+/**
+ * @implements Arrayable<string, mixed>
+ */
+final readonly class KeycloakUser implements Arrayable, Authenticatable, HasKeycloakRoles, \JsonSerializable
 {
     /**
      * @param string[] $roles
@@ -47,9 +51,21 @@ final readonly class KeycloakUser implements Authenticatable, HasKeycloakRoles
     /**
      * @return array<string, mixed>
      */
+    #[\Override]
     public function toArray(): array
     {
         return ['subject' => $this->subject, 'email' => $this->email, 'name' => $this->name, 'roles' => $this->roles];
+    }
+
+    /**
+     * What the frontend sees, e.g. Inertia's shared "auth.user" prop.
+     *
+     * @return array<string, mixed>
+     */
+    #[\Override]
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     public function getSubject(): string
