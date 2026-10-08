@@ -144,6 +144,30 @@ Requests need `Authorization: Bearer <access token>`; the token must carry the
 audience from `keycloak.bearer.audience` (default: the client id). Add an
 audience mapper in Keycloak for that.
 
+### User directory
+
+`Bannerstop\Keycloak\Admin\UserDirectory` lists the users of the realm through
+the admin REST API, e.g. to sync a user table. It authenticates with a service
+account that needs the client role `realm-management` → `view-users`.
+
+Without further configuration it uses the login client, which then needs
+*Service accounts roles* and `view-users` itself. We recommend a separate
+confidential client that only has *Service accounts roles* enabled and
+`view-users` assigned, so that the login client has no admin API rights:
+
+```dotenv
+KEYCLOAK_DIRECTORY_CLIENT_ID=my-app-directory
+KEYCLOAK_DIRECTORY_CLIENT_SECRET=
+```
+
+```php
+use Bannerstop\Keycloak\Admin\UserDirectory;
+
+foreach (app(UserDirectory::class)->users() as $user) {
+    // $user->getId() equals the "sub" of the user's tokens
+}
+```
+
 ### Services
 
 `Bannerstop\Keycloak\KeycloakClient`, `Bannerstop\Keycloak\Admin\UserDirectory`
