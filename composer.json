@@ -12,7 +12,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "bannerstop/keycloak": "^7.0",
+        "bannerstop/keycloak": "^7.1",
         "guzzlehttp/guzzle": "^7.2",
         "illuminate/auth": "^10.0 || ^11.0 || ^12.0",
         "illuminate/http": "^10.0 || ^11.0 || ^12.0",
