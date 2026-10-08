@@ -17,7 +17,7 @@ final class SessionStateStore implements StateStore
     private const MAX_PENDING = 5;
 
     public function __construct(
-        private Session $session,
+        private readonly Session $session,
     ) {
     }
 

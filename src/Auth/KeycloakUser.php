@@ -17,10 +17,10 @@ final class KeycloakUser implements Authenticatable, HasKeycloakRoles
      * @param string[] $roles
      */
     public function __construct(
-        private string $subject,
-        private ?string $email,
-        private string $name,
-        private array $roles,
+        private readonly string $subject,
+        private readonly ?string $email,
+        private readonly string $name,
+        private readonly array $roles,
     ) {
     }
 

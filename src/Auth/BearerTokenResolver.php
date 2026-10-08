@@ -20,11 +20,11 @@ use Psr\Log\LoggerInterface;
 final class BearerTokenResolver
 {
     public function __construct(
-        private KeycloakClient $client,
-        private RoleMapper $roleMapper,
-        private UserProvisioner $provisioner,
-        private LoggerInterface $logger,
-        private ?string $audience,
+        private readonly KeycloakClient $client,
+        private readonly RoleMapper $roleMapper,
+        private readonly UserProvisioner $provisioner,
+        private readonly LoggerInterface $logger,
+        private readonly ?string $audience,
     ) {
     }
 

@@ -3,6 +3,13 @@
 Each major version raises the minimum PHP version and the supported Laravel
 versions. Only the steps that need changes in your code are listed.
 
+## 5.x → 6.x
+
+- PHP 8.1 or later and Laravel 9 or later are required.
+- If you use bannerstop/keycloak directly, see its upgrade guide (enums for
+  algorithms and login failures). Code that only uses this package needs no
+  changes.
+
 ## 4.x → 5.x
 
 - PHP 8.0 or later and Laravel 8 or later are required.

@@ -3,6 +3,13 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 6.0.0
+
+- Requires PHP 8.1 or later, Laravel 9 or 10 and bannerstop/keycloak 6.x.
+- The flashed `keycloak_error` keeps its string values; they now come from
+  the core's `LoginFailure` enum.
+- Readonly properties throughout.
+
 ## 5.0.0
 
 - Requires PHP 8.0 or later, Laravel 8 or 9 and bannerstop/keycloak 5.x.

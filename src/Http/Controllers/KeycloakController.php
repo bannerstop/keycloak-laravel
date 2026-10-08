@@ -28,13 +28,13 @@ final class KeycloakController extends Controller
     private array $config;
 
     public function __construct(
-        private LoginFlow $flow,
-        private KeycloakClient $client,
-        private RoleMapper $roleMapper,
-        private UserProvisioner $provisioner,
-        private AuthFactory $auth,
-        private Redirector $redirector,
-        private LoggerInterface $logger,
+        private readonly LoginFlow $flow,
+        private readonly KeycloakClient $client,
+        private readonly RoleMapper $roleMapper,
+        private readonly UserProvisioner $provisioner,
+        private readonly AuthFactory $auth,
+        private readonly Redirector $redirector,
+        private readonly LoggerInterface $logger,
         Config $config,
     ) {
         $this->config = (array) $config->get('keycloak.login');
@@ -59,9 +59,9 @@ final class KeycloakController extends Controller
         try {
             $result = $this->flow->finish($request->query->all());
         } catch (LoginException $exception) {
-            $this->logger->notice('Keycloak login failed: ' . $exception->getMessage(), ['reason' => $exception->getReason()]);
+            $this->logger->notice('Keycloak login failed: ' . $exception->getMessage(), ['reason' => $exception->getReason()->value]);
 
-            return $this->redirector->to((string) $this->config['failure_redirect_to'])->with('keycloak_error', $exception->getReason());
+            return $this->redirector->to((string) $this->config['failure_redirect_to'])->with('keycloak_error', $exception->getReason()->value);
         }
 
         $identity = $result->getIdentity();
