@@ -45,7 +45,7 @@ final class BearerTokenResolver
 
     public function __invoke(Request $request): ?Authenticatable
     {
-        $token = BearerToken::fromAuthorizationHeader($request->header('Authorization'));
+        $token = BearerToken::fromAuthorizationHeader($request->headers->get('Authorization'));
         if (null === $token) {
             return null;
         }

@@ -17,7 +17,7 @@ use Bannerstop\KeycloakLaravel\Auth\UserProvisioner;
 use Bannerstop\KeycloakLaravel\Http\Middleware\RequireKeycloakRole;
 use GuzzleHttp\Client as GuzzleClient;
 use Http\Adapter\Guzzle6\Client as Guzzle6Adapter;
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -29,10 +29,10 @@ final class KeycloakServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/keycloak.php', 'keycloak');
 
-        $this->app->singleton(KeycloakConfig::class, function (Container $app): KeycloakConfig {
-            return KeycloakConfig::fromArray((array) $app['config']->get('keycloak'));
+        $this->app->singleton(KeycloakConfig::class, function (Application $app): KeycloakConfig {
+            return KeycloakConfig::fromArray((array) $app->make('config')->get('keycloak'));
         });
-        $this->app->singleton(KeycloakClient::class, function (Container $app): KeycloakClient {
+        $this->app->singleton(KeycloakClient::class, function (Application $app): KeycloakClient {
             $factory = new Psr17Factory();
 
             return new KeycloakClient(
@@ -40,29 +40,29 @@ final class KeycloakServiceProvider extends ServiceProvider
                 $this->httpClient($app),
                 $factory,
                 $factory,
-                $app['cache']->store($app['config']->get('keycloak.cache_store'))
+                $app->make('cache')->store($app->make('config')->get('keycloak.cache_store'))
             );
         });
-        $this->app->singleton(UserDirectory::class, function (Container $app): UserDirectory {
+        $this->app->singleton(UserDirectory::class, function (Application $app): UserDirectory {
             return new UserDirectory($app->make(KeycloakClient::class));
         });
-        $this->app->singleton(RoleMapper::class, function (Container $app): RoleMapper {
-            return RoleMapper::fromArray((array) $app['config']->get('keycloak.roles'));
+        $this->app->singleton(RoleMapper::class, function (Application $app): RoleMapper {
+            return RoleMapper::fromArray((array) $app->make('config')->get('keycloak.roles'));
         });
-        $this->app->bind(LoginFlow::class, function (Container $app): LoginFlow {
-            $login = (array) $app['config']->get('keycloak.login');
+        $this->app->bind(LoginFlow::class, function (Application $app): LoginFlow {
+            $login = (array) $app->make('config')->get('keycloak.login');
             $policies = [];
             if ([] !== (array) ($login['allowed_email_domains'] ?? [])) {
                 $policies[] = new EmailDomainPolicy((array) $login['allowed_email_domains'], (bool) ($login['require_verified_email'] ?? true));
             }
 
-            return new LoginFlow($app->make(KeycloakClient::class), new SessionStateStore($app['session.store']), $policies);
+            return new LoginFlow($app->make(KeycloakClient::class), new SessionStateStore($app->make('session.store')), $policies);
         });
-        $this->app->bind(KeycloakUserProvider::class, function (Container $app): KeycloakUserProvider {
-            return new KeycloakUserProvider($app['session.store']);
+        $this->app->bind(KeycloakUserProvider::class, function (Application $app): KeycloakUserProvider {
+            return new KeycloakUserProvider($app->make('session.store'));
         });
-        $this->app->bind(UserProvisioner::class, function (Container $app): UserProvisioner {
-            return $app->make($app['config']->get('keycloak.user_provisioner') ?? KeycloakUserProvider::class);
+        $this->app->bind(UserProvisioner::class, function (Application $app): UserProvisioner {
+            return $app->make($app->make('config')->get('keycloak.user_provisioner') ?? KeycloakUserProvider::class);
         });
     }
 
@@ -70,11 +70,11 @@ final class KeycloakServiceProvider extends ServiceProvider
     {
         $this->publishes([__DIR__ . '/../config/keycloak.php' => $this->app->configPath('keycloak.php')], 'keycloak-config');
 
-        if ($this->app['config']->get('keycloak.routes.enabled', true)) {
+        if ($this->app->make('config')->get('keycloak.routes.enabled', true)) {
             $this->loadRoutesFrom(__DIR__ . '/../routes/keycloak.php');
         }
 
-        Auth::provider('keycloak', function (Container $app): KeycloakUserProvider {
+        Auth::provider('keycloak', function (Application $app): KeycloakUserProvider {
             return $app->make(KeycloakUserProvider::class);
         });
         Auth::viaRequest('keycloak-bearer', function ($request) {
@@ -83,16 +83,16 @@ final class KeycloakServiceProvider extends ServiceProvider
                 $this->app->make(RoleMapper::class),
                 $this->app->make(UserProvisioner::class),
                 $this->app->make('log'),
-                $this->app['config']->get('keycloak.bearer.audience')
+                $this->app->make('config')->get('keycloak.bearer.audience')
             ))($request);
         });
 
-        $this->app['router']->aliasMiddleware('keycloak.role', RequireKeycloakRole::class);
+        $this->app->make('router')->aliasMiddleware('keycloak.role', RequireKeycloakRole::class);
     }
 
-    private function httpClient(Container $app): ClientInterface
+    private function httpClient(Application $app): ClientInterface
     {
-        $configured = $app['config']->get('keycloak.http_client');
+        $configured = $app->make('config')->get('keycloak.http_client');
         if (null !== $configured) {
             return $app->make($configured);
         }

@@ -73,7 +73,7 @@ final class KeycloakController extends Controller
      */
     public function login(Request $request): RedirectResponse
     {
-        $returnTo = $request->query('return_to');
+        $returnTo = $request->query->get('return_to');
 
         return $this->redirector->away($this->flow->start(
             $this->redirector->getUrlGenerator()->route('keycloak.callback'),
@@ -85,7 +85,7 @@ final class KeycloakController extends Controller
     public function callback(Request $request): RedirectResponse
     {
         try {
-            $result = $this->flow->finish($request->query());
+            $result = $this->flow->finish($request->query->all());
         } catch (LoginException $exception) {
             $this->logger->notice('Keycloak login failed: ' . $exception->getMessage(), ['reason' => $exception->getReason()]);
 
