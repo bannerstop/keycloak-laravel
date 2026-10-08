@@ -60,4 +60,11 @@ return [
 
     // Class name of a UserProvisioner, null for session-only KeycloakUser objects
     'user_provisioner' => null,
+
+    // A separate client for the user directory (admin API), with only the service
+    // account role realm-management -> view-users. Null uses the login client.
+    'directory' => [
+        'client_id' => env('KEYCLOAK_DIRECTORY_CLIENT_ID'),
+        'client_secret' => env('KEYCLOAK_DIRECTORY_CLIENT_SECRET'),
+    ],
 ];
