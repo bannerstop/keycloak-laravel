@@ -16,6 +16,7 @@ single sign-on with Keycloak.
 | 1.x     | ≥ 7.1.3 | 5.8 – 8.x   |
 | 2.x     | ≥ 7.2   | 6.x – 8.x   |
 | 3.x     | ≥ 7.3   | 6.x – 8.x   |
+| 4.x     | ≥ 7.4   | 6.x – 8.x   |
 
 ## Installation
 

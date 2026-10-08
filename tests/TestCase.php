@@ -12,7 +12,7 @@ use Orchestra\Testbench\TestCase as Testbench;
 abstract class TestCase extends Testbench
 {
     /** @var array<string, string> */
-    private $cookies = [];
+    private array $cookies = [];
 
     /**
      * @param \Illuminate\Foundation\Application $app
@@ -56,14 +56,10 @@ abstract class TestCase extends Testbench
             return null === $user ? ['user' => null] : $user->toArray();
         };
         Route::middleware('web')->group(function () use ($me) {
-            Route::get('/login', static function () {
-                return redirect()->route('keycloak.login');
-            })->name('login');
+            Route::get('/login', static fn () => redirect()->route('keycloak.login'))->name('login');
             Route::get('/me', $me)->middleware('auth');
             Route::get('/admin', $me)->middleware(['auth', 'keycloak.role:admin']);
-            Route::get('/public', static function () {
-                return ['error' => session('keycloak_error')];
-            });
+            Route::get('/public', static fn () => ['error' => session('keycloak_error')]);
         });
         Route::get('/api/me', $me)->middleware('auth:api');
     }

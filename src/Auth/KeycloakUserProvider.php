@@ -17,8 +17,7 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
 {
     private const SESSION_KEY = 'keycloak.user';
 
-    /** @var Session */
-    private $session;
+    private Session $session;
 
     public function __construct(Session $session)
     {

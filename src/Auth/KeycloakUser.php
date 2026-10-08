@@ -13,17 +13,12 @@ use Illuminate\Contracts\Auth\Authenticatable;
  */
 final class KeycloakUser implements Authenticatable, HasKeycloakRoles
 {
-    /** @var string */
-    private $subject;
-
-    /** @var string|null */
-    private $email;
-
-    /** @var string */
-    private $name;
+    private string $subject;
+    private ?string $email;
+    private string $name;
 
     /** @var string[] */
-    private $roles;
+    private array $roles;
 
     /**
      * @param string[] $roles

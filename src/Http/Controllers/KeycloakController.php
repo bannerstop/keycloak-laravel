@@ -24,29 +24,16 @@ final class KeycloakController extends Controller
 {
     private const TOKENS = 'keycloak.tokens';
 
-    /** @var LoginFlow */
-    private $flow;
-
-    /** @var KeycloakClient */
-    private $client;
-
-    /** @var RoleMapper */
-    private $roleMapper;
-
-    /** @var UserProvisioner */
-    private $provisioner;
-
-    /** @var AuthFactory */
-    private $auth;
-
-    /** @var Redirector */
-    private $redirector;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private LoginFlow $flow;
+    private KeycloakClient $client;
+    private RoleMapper $roleMapper;
+    private UserProvisioner $provisioner;
+    private AuthFactory $auth;
+    private Redirector $redirector;
+    private LoggerInterface $logger;
 
     /** @var array<string, mixed> */
-    private $config;
+    private array $config;
 
     public function __construct(
         LoginFlow $flow,

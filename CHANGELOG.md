@@ -3,6 +3,11 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 4.0.0
+
+- Requires PHP 7.4 or later and bannerstop/keycloak 4.x.
+- Typed properties and arrow functions throughout.
+
 ## 3.0.0
 
 - Requires PHP 7.3 or later and bannerstop/keycloak 3.x.

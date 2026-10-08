@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "php": "^7.3 || ^8.0",
-        "bannerstop/keycloak": "^3.0",
+        "php": "^7.4 || ^8.0",
+        "bannerstop/keycloak": "^4.0",
         "illuminate/auth": "^6.0 || ^7.0 || ^8.0",
         "illuminate/http": "^6.0 || ^7.0 || ^8.0",
         "illuminate/routing": "^6.0 || ^7.0 || ^8.0",
@@ -23,7 +23,7 @@
         "ext-curl": "*",
         "guzzlehttp/guzzle": "^6.5 || ^7.0",
         "orchestra/testbench": "^4.0 || ^5.0 || ^6.0",
-        "phpunit/phpunit": "^8.5.21 || ^9.6"
+        "phpunit/phpunit": "^9.6"
     },
     "suggest": {
         "guzzlehttp/guzzle": "Guzzle 7 is a PSR-18 client and used automatically",

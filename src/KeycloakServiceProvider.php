@@ -29,9 +29,7 @@ final class KeycloakServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/keycloak.php', 'keycloak');
 
-        $this->app->singleton(KeycloakConfig::class, function (Application $app): KeycloakConfig {
-            return KeycloakConfig::fromArray((array) $app->make('config')->get('keycloak'));
-        });
+        $this->app->singleton(KeycloakConfig::class, fn (Application $app): KeycloakConfig => KeycloakConfig::fromArray((array) $app->make('config')->get('keycloak')));
         $this->app->singleton(KeycloakClient::class, function (Application $app): KeycloakClient {
             $factory = new Psr17Factory();
 
@@ -43,12 +41,8 @@ final class KeycloakServiceProvider extends ServiceProvider
                 $app->make('cache')->store($app->make('config')->get('keycloak.cache_store'))
             );
         });
-        $this->app->singleton(UserDirectory::class, function (Application $app): UserDirectory {
-            return new UserDirectory($app->make(KeycloakClient::class));
-        });
-        $this->app->singleton(RoleMapper::class, function (Application $app): RoleMapper {
-            return RoleMapper::fromArray((array) $app->make('config')->get('keycloak.roles'));
-        });
+        $this->app->singleton(UserDirectory::class, fn (Application $app): UserDirectory => new UserDirectory($app->make(KeycloakClient::class)));
+        $this->app->singleton(RoleMapper::class, fn (Application $app): RoleMapper => RoleMapper::fromArray((array) $app->make('config')->get('keycloak.roles')));
         $this->app->bind(LoginFlow::class, function (Application $app): LoginFlow {
             $login = (array) $app->make('config')->get('keycloak.login');
             $policies = [];
@@ -58,12 +52,8 @@ final class KeycloakServiceProvider extends ServiceProvider
 
             return new LoginFlow($app->make(KeycloakClient::class), new SessionStateStore($app->make('session.store')), $policies);
         });
-        $this->app->bind(KeycloakUserProvider::class, function (Application $app): KeycloakUserProvider {
-            return new KeycloakUserProvider($app->make('session.store'));
-        });
-        $this->app->bind(UserProvisioner::class, function (Application $app): UserProvisioner {
-            return $app->make($app->make('config')->get('keycloak.user_provisioner') ?? KeycloakUserProvider::class);
-        });
+        $this->app->bind(KeycloakUserProvider::class, fn (Application $app): KeycloakUserProvider => new KeycloakUserProvider($app->make('session.store')));
+        $this->app->bind(UserProvisioner::class, fn (Application $app): UserProvisioner => $app->make($app->make('config')->get('keycloak.user_provisioner') ?? KeycloakUserProvider::class));
     }
 
     public function boot(): void
@@ -74,18 +64,14 @@ final class KeycloakServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__ . '/../routes/keycloak.php');
         }
 
-        Auth::provider('keycloak', function (Application $app): KeycloakUserProvider {
-            return $app->make(KeycloakUserProvider::class);
-        });
-        Auth::viaRequest('keycloak-bearer', function ($request) {
-            return (new BearerTokenResolver(
-                $this->app->make(KeycloakClient::class),
-                $this->app->make(RoleMapper::class),
-                $this->app->make(UserProvisioner::class),
-                $this->app->make('log'),
-                $this->app->make('config')->get('keycloak.bearer.audience')
-            ))($request);
-        });
+        Auth::provider('keycloak', fn (Application $app): KeycloakUserProvider => $app->make(KeycloakUserProvider::class));
+        Auth::viaRequest('keycloak-bearer', fn ($request) => (new BearerTokenResolver(
+            $this->app->make(KeycloakClient::class),
+            $this->app->make(RoleMapper::class),
+            $this->app->make(UserProvisioner::class),
+            $this->app->make('log'),
+            $this->app->make('config')->get('keycloak.bearer.audience')
+        ))($request));
 
         $this->app->make('router')->aliasMiddleware('keycloak.role', RequireKeycloakRole::class);
     }
