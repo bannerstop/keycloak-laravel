@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "php": "^8.4",
-        "bannerstop/keycloak": "^9.0",
+        "php": "^8.5",
+        "bannerstop/keycloak": "^10.0",
         "guzzlehttp/guzzle": "^7.2",
         "illuminate/auth": "^12.0 || ^13.0",
         "illuminate/http": "^12.0 || ^13.0",
@@ -23,7 +23,7 @@
     "require-dev": {
         "ext-curl": "*",
         "orchestra/testbench": "^10.0 || ^11.0",
-        "phpunit/phpunit": "^11.5 || ^12.0"
+        "phpunit/phpunit": "^12.0"
     },
     "autoload": {
         "psr-4": {

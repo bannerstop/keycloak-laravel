@@ -3,6 +3,10 @@
 Each major version raises the minimum PHP version and the supported Laravel
 versions. Only the steps that need changes in your code are listed.
 
+## 9.x → 10.x
+
+- PHP 8.5 or later is required. No code changes needed.
+
 ## 8.x → 9.x
 
 - PHP 8.4 or later and Laravel 12 or later are required. No code changes needed.

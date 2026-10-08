@@ -3,6 +3,13 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 10.0.0
+
+- Requires PHP 8.5 or later, Laravel 12 or 13 and bannerstop/keycloak 10.x.
+- No API changes beyond the PHP range. The test suite reads the Keycloak login
+  form with `Dom\HTMLDocument` and drops the `curl_close()` calls deprecated in
+  PHP 8.5.
+
 ## 9.0.0
 
 - Requires PHP 8.4 or later, Laravel 12 or 13 and bannerstop/keycloak 9.x.

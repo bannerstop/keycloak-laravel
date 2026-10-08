@@ -117,18 +117,17 @@ final class KeycloakLoginTest extends TestCase
         $cookies = (string) tempnam(sys_get_temp_dir(), 'kc');
         $curl = curl_init($authorizationUrl);
         curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEJAR => $cookies, CURLOPT_COOKIEFILE => $cookies]);
-        $html = (string) curl_exec($curl);
-        self::assertSame(1, preg_match('/<form[^>]+id="kc-form-login"[^>]+action="([^"]+)"/', $html, $form), 'Keycloak shows its login form.');
+        $form = \Dom\HTMLDocument::createFromString((string) curl_exec($curl), LIBXML_NOERROR)->getElementById('kc-form-login');
+        self::assertNotNull($form, 'Keycloak shows its login form.');
         curl_setopt_array($curl, [
-            CURLOPT_URL => html_entity_decode($form[1]),
+            CURLOPT_URL => $form->getAttribute('action'),
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => http_build_query(['username' => 'jdoe', 'password' => 'jane-password']),
-            CURLOPT_HEADER => true,
         ]);
-        $response = (string) curl_exec($curl);
-        curl_close($curl);
-        self::assertSame(1, preg_match('/^Location: (\S+)/mi', $response, $location), 'Keycloak redirects back.');
-        parse_str((string) parse_url($location[1], PHP_URL_QUERY), $query);
+        curl_exec($curl);
+        $location = (string) curl_getinfo($curl, CURLINFO_REDIRECT_URL);
+        self::assertNotSame('', $location, 'Keycloak redirects back.');
+        parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
 
         return $query;
     }
@@ -142,7 +141,6 @@ final class KeycloakLoginTest extends TestCase
             CURLOPT_POSTFIELDS => http_build_query(['grant_type' => 'password', 'client_id' => 'app', 'client_secret' => 'app-secret', 'username' => 'jdoe', 'password' => 'jane-password', 'scope' => 'openid']),
         ]);
         $response = json_decode((string) curl_exec($curl), true);
-        curl_close($curl);
 
         return $response['access_token'];
     }
