@@ -17,6 +17,7 @@ single sign-on with Keycloak.
 | 2.x     | ≥ 7.2   | 6.x – 8.x   |
 | 3.x     | ≥ 7.3   | 6.x – 8.x   |
 | 4.x     | ≥ 7.4   | 6.x – 8.x   |
+| 5.x     | ≥ 8.0   | 8.x – 9.x   |
 
 ## Installation
 
@@ -24,12 +25,8 @@ single sign-on with Keycloak.
 composer require bannerstop/keycloak-laravel
 ```
 
-The package uses Guzzle 7 if it is installed (it is in every Laravel 8+
-application). With Guzzle 6 (Laravel 6 and 7) also install the adapter:
-
-```bash
-composer require php-http/guzzle6-adapter
-```
+The package talks to Keycloak through Guzzle 7. Set `keycloak.http_client`
+to the class name of another PSR-18 client to replace it.
 
 Publish the configuration and set the environment variables:
 

@@ -15,7 +15,7 @@ return [
     // Cache store for the discovery document and the signing keys, null for the default store
     'cache_store' => null,
 
-    // Class name of a PSR-18 client, null to detect Guzzle 7 or the Guzzle 6 adapter
+    // Class name of a PSR-18 client, null for Guzzle
     'http_client' => null,
 
     'login' => [

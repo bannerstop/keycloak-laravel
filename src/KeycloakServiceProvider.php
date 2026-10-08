@@ -16,7 +16,6 @@ use Bannerstop\KeycloakLaravel\Auth\SessionStateStore;
 use Bannerstop\KeycloakLaravel\Auth\UserProvisioner;
 use Bannerstop\KeycloakLaravel\Http\Middleware\RequireKeycloakRole;
 use GuzzleHttp\Client as GuzzleClient;
-use Http\Adapter\Guzzle6\Client as Guzzle6Adapter;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
@@ -79,16 +78,7 @@ final class KeycloakServiceProvider extends ServiceProvider
     private function httpClient(Application $app): ClientInterface
     {
         $configured = $app->make('config')->get('keycloak.http_client');
-        if (null !== $configured) {
-            return $app->make($configured);
-        }
-        if (class_exists(GuzzleClient::class) && is_subclass_of(GuzzleClient::class, ClientInterface::class)) {
-            return new GuzzleClient(['timeout' => 10]);
-        }
-        if (class_exists(Guzzle6Adapter::class)) {
-            return Guzzle6Adapter::createWithConfig(['timeout' => 10]);
-        }
 
-        throw new \LogicException('bannerstop/keycloak-laravel needs a PSR-18 HTTP client: install guzzlehttp/guzzle ^7, php-http/guzzle6-adapter, or set keycloak.http_client.');
+        return null === $configured ? new GuzzleClient(['timeout' => 10]) : $app->make($configured);
     }
 }

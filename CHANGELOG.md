@@ -3,6 +3,13 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 5.0.0
+
+- Requires PHP 8.0 or later, Laravel 8 or 9 and bannerstop/keycloak 5.x.
+- Talks to Keycloak through Guzzle 7, now a regular dependency; the Guzzle 6
+  adapter path is gone. `keycloak.http_client` still takes another PSR-18 client.
+- Constructor property promotion, `mixed` and trailing commas throughout.
+
 ## 4.0.0
 
 - Requires PHP 7.4 or later and bannerstop/keycloak 4.x.

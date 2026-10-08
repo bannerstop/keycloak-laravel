@@ -14,10 +14,7 @@ use Illuminate\Http\Request;
  */
 final class RequireKeycloakRole
 {
-    /**
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next, string ...$roles)
+    public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
         $user = $request->user();
         if (!$user instanceof HasKeycloakRoles || [] === array_intersect($roles, $user->getKeycloakRoles())) {

@@ -3,6 +3,11 @@
 Each major version raises the minimum PHP version and the supported Laravel
 versions. Only the steps that need changes in your code are listed.
 
+## 4.x → 5.x
+
+- PHP 8.0 or later and Laravel 8 or later are required.
+- Remove `php-http/guzzle6-adapter`; the package now requires Guzzle 7.
+
 ## 3.x → 4.x
 
 - PHP 7.4 or later is required. No code changes needed.

@@ -16,11 +16,9 @@ final class SessionStateStore implements StateStore
     private const KEY = 'keycloak.logins';
     private const MAX_PENDING = 5;
 
-    private Session $session;
-
-    public function __construct(Session $session)
-    {
-        $this->session = $session;
+    public function __construct(
+        private Session $session,
+    ) {
     }
 
     public function save(PendingLogin $login): void

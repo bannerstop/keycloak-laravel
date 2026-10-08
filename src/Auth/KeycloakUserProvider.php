@@ -17,11 +17,9 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
 {
     private const SESSION_KEY = 'keycloak.user';
 
-    private Session $session;
-
-    public function __construct(Session $session)
-    {
-        $this->session = $session;
+    public function __construct(
+        private Session $session,
+    ) {
     }
 
     public function provision(Identity $identity, array $roles): Authenticatable
@@ -32,10 +30,7 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
         return $user;
     }
 
-    /**
-     * @param mixed $identifier
-     */
-    public function retrieveById($identifier): ?Authenticatable
+    public function retrieveById(mixed $identifier): ?Authenticatable
     {
         $data = $this->session->get(self::SESSION_KEY);
         $user = is_array($data) ? KeycloakUser::fromArray($data) : null;
@@ -44,10 +39,9 @@ final class KeycloakUserProvider implements UserProvider, UserProvisioner
     }
 
     /**
-     * @param mixed  $identifier
      * @param string $token
      */
-    public function retrieveByToken($identifier, $token): ?Authenticatable
+    public function retrieveByToken(mixed $identifier, $token): ?Authenticatable
     {
         return null;
     }

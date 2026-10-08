@@ -24,34 +24,19 @@ final class KeycloakController extends Controller
 {
     private const TOKENS = 'keycloak.tokens';
 
-    private LoginFlow $flow;
-    private KeycloakClient $client;
-    private RoleMapper $roleMapper;
-    private UserProvisioner $provisioner;
-    private AuthFactory $auth;
-    private Redirector $redirector;
-    private LoggerInterface $logger;
-
     /** @var array<string, mixed> */
     private array $config;
 
     public function __construct(
-        LoginFlow $flow,
-        KeycloakClient $client,
-        RoleMapper $roleMapper,
-        UserProvisioner $provisioner,
-        AuthFactory $auth,
-        Redirector $redirector,
-        LoggerInterface $logger,
-        Config $config
+        private LoginFlow $flow,
+        private KeycloakClient $client,
+        private RoleMapper $roleMapper,
+        private UserProvisioner $provisioner,
+        private AuthFactory $auth,
+        private Redirector $redirector,
+        private LoggerInterface $logger,
+        Config $config,
     ) {
-        $this->flow = $flow;
-        $this->client = $client;
-        $this->roleMapper = $roleMapper;
-        $this->provisioner = $provisioner;
-        $this->auth = $auth;
-        $this->redirector = $redirector;
-        $this->logger = $logger;
         $this->config = (array) $config->get('keycloak.login');
     }
 
@@ -109,7 +94,7 @@ final class KeycloakController extends Controller
         }
         try {
             $url = $this->client->getLogoutUrl($target, TokenSet::fromArray($tokens)->getIdToken());
-        } catch (HttpException $exception) {
+        } catch (HttpException) {
             $url = null;
         }
 

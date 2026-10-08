@@ -53,7 +53,7 @@ abstract class TestCase extends Testbench
         $me = static function (Request $request) {
             $user = $request->user();
 
-            return null === $user ? ['user' => null] : $user->toArray();
+            return $user?->toArray() ?? ['user' => null];
         };
         Route::middleware('web')->group(function () use ($me) {
             Route::get('/login', static fn () => redirect()->route('keycloak.login'))->name('login');
