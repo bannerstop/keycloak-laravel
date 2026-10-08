@@ -49,6 +49,28 @@ final class KeycloakLoginTest extends TestCase
         self::assertSame(302, $this->browse('GET', '/me')->getStatusCode(), 'The local session is gone.');
     }
 
+    public function testInertiaVisits(): void
+    {
+        $inertia = ['HTTP_X_INERTIA' => 'true', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'];
+
+        // An XHR cannot follow a redirect to Keycloak: Inertia gets 409 + X-Inertia-Location and navigates itself.
+        $response = $this->browse('GET', '/login/keycloak/login?return_to=/me', $inertia);
+        self::assertSame(409, $response->getStatusCode());
+        $authorizationUrl = (string) $response->headers->get('X-Inertia-Location');
+        self::assertStringStartsWith(getenv('KEYCLOAK_URL') . '/realms/example/protocol/openid-connect/auth?', $authorizationUrl);
+
+        $this->browse('GET', '/login/keycloak/callback?' . http_build_query(self::keycloakLogin($authorizationUrl)));
+
+        $shared = $this->browse('GET', '/shared', $inertia)->json();
+        self::assertSame('jane.doe@example.com', $shared['auth']['user']['email']);
+        self::assertSame(['user', 'admin', 'editor', 'it'], $shared['auth']['user']['roles']);
+
+        $response = $this->browse('POST', '/login/keycloak/logout', $inertia);
+        self::assertSame(409, $response->getStatusCode());
+        self::assertStringStartsWith(getenv('KEYCLOAK_URL') . '/realms/example/protocol/openid-connect/logout?', (string) $response->headers->get('X-Inertia-Location'));
+        self::assertSame(302, $this->browse('GET', '/me')->getStatusCode(), 'The local session is gone.');
+    }
+
     public function testRolesAreOnlyGrantedWhenMapped(): void
     {
         $this->app['config']->set('keycloak.roles.realm_roles', []);
