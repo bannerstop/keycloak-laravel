@@ -3,6 +3,14 @@
 The project follows [Semantic Versioning](https://semver.org/). Each major
 version raises the minimum PHP version and the supported Laravel versions.
 
+## 8.1.0
+
+- Optional separate client for the user directory: set
+  `keycloak.directory.client_id` and `keycloak.directory.client_secret`
+  (`KEYCLOAK_DIRECTORY_CLIENT_ID`, `KEYCLOAK_DIRECTORY_CLIENT_SECRET`), so that
+  the login client needs no admin API rights. Without them the login client is
+  used as before.
+
 ## 8.0.0
 
 - Requires PHP 8.3 or later, Laravel 11, 12 or 13 and bannerstop/keycloak 8.x.
