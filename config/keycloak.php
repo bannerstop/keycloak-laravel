@@ -33,6 +33,14 @@ return [
         'authorization_parameters' => [],
     ],
 
+    'session' => [
+        // Seconds between checks of the Keycloak session through the refresh token
+        // (middleware "keycloak.session"); 0 only honours back-channel logouts
+        'check_interval' => (int) env('KEYCLOAK_SESSION_CHECK_INTERVAL', 0),
+        // How long ended Keycloak sessions are remembered; should be at least the session lifetime
+        'revocation_ttl' => 28800,
+    ],
+
     'routes' => [
         'enabled' => true,
         'prefix' => 'keycloak',
