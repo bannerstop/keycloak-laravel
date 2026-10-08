@@ -14,6 +14,7 @@ single sign-on with Keycloak.
 | Version | PHP     | Laravel     |
 |---------|---------|-------------|
 | 1.x     | ≥ 7.1.3 | 5.8 – 8.x   |
+| 2.x     | ≥ 7.2   | 6.x – 8.x   |
 
 ## Installation
 
@@ -22,7 +23,7 @@ composer require bannerstop/keycloak-laravel
 ```
 
 The package uses Guzzle 7 if it is installed (it is in every Laravel 8+
-application). With Guzzle 6 (Laravel 5.8 to 7) also install the adapter:
+application). With Guzzle 6 (Laravel 6 and 7) also install the adapter:
 
 ```bash
 composer require php-http/guzzle6-adapter
